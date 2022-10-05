@@ -3,25 +3,22 @@
  * Author Name: Melissa Kim
  * Date: 23/09/2022
  * Application Purpose:Develop software application for 'LANGHAM Hotels' to manage their day-to-day operations 
- * like the allocatin of rooms, deallocation of rooms, displaying the status of rooms, and other functionality.
+ * like the allocation of rooms, deallocation of rooms, displaying the status of rooms, and other functionality.
  */
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Reflection;
-using System.Globalization;
+using System.Linq;
 
-namespace Assessment_2Task1
+namespace Assessment2Task2
 {
     // Custom Class - Room
     public class Room
     {
         //Declare integer variable for room number
         public int RoomNo { get; set; }
-        //Declare boolean variable for whether room is allocate or not
+        //Declare boolean variable for whether room is allocated or not
         public bool IsAllocated { get; set; }
     }
     // Custom Class - Customer
@@ -70,7 +67,7 @@ namespace Assessment_2Task1
             //Format exception, invalid operation exception
             try
             {
-                //Declare character variable
+                //Initialise integer variable
                 int choice;
                 //Do while loop for continuing with menu or not
                 do
@@ -94,7 +91,7 @@ namespace Assessment_2Task1
                     Console.WriteLine("***********************************************************************************");
                     //Ask user to enter a number for menu choice
                     Console.Write("Enter Your Choice Number Here (0-9): ");
-                    //Declare integer variable for user input 
+                    //Convert and save user input as a variable
                     choice = Convert.ToInt32(Console.ReadLine());
                     //Switch case for menu choice
                     switch (choice)
@@ -152,13 +149,11 @@ namespace Assessment_2Task1
                         //For invalid input
                         default:
                             //Display invalid input message, ask user to input valid number
-                            Console.WriteLine("Please enter a valid number between 0-9\n");
+                            Console.WriteLine("Please enter a valid number between 0-9");
                             break;
                     }
-                    //menu continues until user press 0
+                //menu continues until user press 0
                 } while (choice != 0);
-                //Clear console
-                //Console.Clear();
             }
             catch (FormatException ex)
             {
@@ -186,11 +181,12 @@ namespace Assessment_2Task1
             {
                 //Display 'add rooms' choice selected
                 Console.WriteLine("You have selected 'ADD ROOMS' from menu");
-                //Ask user how many rooms to add and save as integer variable
+                //Ask user how many rooms to add, and convert and save as integer variable
                 Console.Write("Please enter the total number of rooms in the Hotel: ");
                 noOfRoom = Convert.ToInt32(Console.ReadLine());
                 //Display how many rooms are there in total
                 Console.WriteLine($"Hotel has {noOfRoom} rooms in total");
+                Console.WriteLine("***********************************************************************************");
                 //Create new array with number of rooms to add
                 listOfRooms = new Room[noOfRoom];
                 //Use for loop to ask user to input room details and save it
@@ -222,9 +218,7 @@ namespace Assessment_2Task1
                                 //Declare room allocation status to false(not allocated)
                                 room.IsAllocated = false;
                                 //Save the new room object to array of Room
-                                listOfRooms[i] = room;
-                                //Setting j to 0 so for loop can start again to check new input
-                                j = 0;
+                                listOfRooms[i] = room;                               
                             }
                         }
                     }
@@ -242,14 +236,23 @@ namespace Assessment_2Task1
         //Method to display rooms
         public static void DisplayRooms()
         {
-            //Display 'display rooms'choice selected
-            Console.WriteLine("You have selected 'DISPLAY ROOMS' from menu");
-            Console.WriteLine("***********************************************************************************");
-            Console.WriteLine($"Following rooms have been added");
-            //Use foreach loop to display details of each room
-            foreach (Room room in listOfRooms)
+            //If condition to check there is any rooms to display
+            if(listOfRooms != null)
             {
-                Console.WriteLine($"Room Number: {room.RoomNo}");
+                //Display 'display rooms' choice selected
+                Console.WriteLine("You have selected 'DISPLAY ROOMS' from menu");
+                Console.WriteLine("***********************************************************************************");
+                Console.WriteLine($"Following rooms have been added");
+                //Use foreach loop to display details of each room
+                foreach (Room room in listOfRooms)
+                {
+                    Console.WriteLine($"Room Number: {room.RoomNo}");
+                }
+            }
+            //If nothing to display, display following message
+            else
+            {
+                Console.WriteLine("No rooms to display\nPlease add rooms first");
             }
         }
         //Method to allocate rooms to customer
@@ -257,7 +260,7 @@ namespace Assessment_2Task1
         {
             //Format exception, Invalid operation exception
             try
-            {
+            { 
                 //Display 'allocate rooms' choice selected
                 Console.WriteLine("You have selected 'ALLOCATE ROOMS' from menu");
                 //Ask user to input how many rooms to allocate
@@ -268,10 +271,11 @@ namespace Assessment_2Task1
                 while (allRoom > noOfRoom)
                 {
                     //Display input is incorrect message and give another chance
-                    Console.Write($"You cannot allocate more rooms than total number of rooms in the Hotel\nPlease enter number between 1-{noOfRoom}: ");
+                    Console.Write($"You cannot allocate more rooms than total number of rooms in the Hotel\n" +
+                        $"Please enter number between 1-{noOfRoom}: ");
                     allRoom = Convert.ToInt32(Console.ReadLine());
                 }
-                //Display how many will be allocated
+                //Display how many room will be allocated
                 Console.WriteLine($"You are allocating {allRoom} room(s)");
                 //Use for loop to each room and customer details for allocation
                 for (int i = 0; i < allRoom; i++)
@@ -319,13 +323,15 @@ namespace Assessment_2Task1
                                 roomAllocation.AllocatedCustomer = customer;
                                 //Add object to the list
                                 listOfRoomAllocations.Add(roomAllocation);
-                                //listOfRoomAllocations.Insert(j, roomAllocation);
                                 break;
                             }
                             //If room is already allocated, display message: room is occupied 
                             else
                             {
-                                Console.WriteLine($"Room {listOfRooms[j].RoomNo} is already occupied\nPlease find another room to allocate");
+                                Console.WriteLine($"Room {listOfRooms[j].RoomNo} is already occupied\n" +
+                                    $"Please enter another room to allocate");
+                                //Give user another chance
+                                i -= 1;
                                 break;
                             }
                         }
@@ -333,9 +339,13 @@ namespace Assessment_2Task1
                         else
                         {
                             //If no matching room number found, display message
-                            if (j == noOfRoom - 1)
+                            while (j == noOfRoom - 1)
                             {
-                                Console.WriteLine("Could not find matching room number to allocate\nPlease enter correct room number or add room first");
+                                Console.WriteLine("Could not find matching room number to allocate\n" +
+                                    "Please enter correct room number or add room first");
+                                //Give user another chance
+                                i -= 1;
+                                break;
                             }
                         }
                     }
@@ -366,23 +376,29 @@ namespace Assessment_2Task1
             {
                 //Display 'deallocate rooms' choice selected
                 Console.WriteLine("You have selected 'DEALLOCATE ROOMS' from menu");
+                //Ask user how many rooms to deallocate
                 Console.Write("How many rooms would you like to deallocate?: ");
-                int deAllRoom = Convert.ToInt32(Console.ReadLine());
-                //Use while loop to check user input is correct
-                while (deAllRoom > noOfRoom)
+                //Declare integer variable, convert user input to integer and save it
+                int deAllRoom = Convert.ToInt32(Console.ReadLine());                
+                //Use while loop to check user input is correct (needs to be less than number of rooms allocated)
+                while (deAllRoom > listOfRoomAllocations.Count)
                 {
-                    //Display input is incorrect message and give another chance
-                    Console.Write($"You cannot deallocate more rooms than total number of rooms in the Hotel\nPlease enter number between 1-{noOfRoom}: ");
+                    //Display input is incorrect message and give user another chance
+                    Console.Write($"You cannot deallocate more rooms than you have allocated\n" +
+                        $"Please enter number between 1-{listOfRoomAllocations.Count}: ");
                     deAllRoom = Convert.ToInt32(Console.ReadLine());
                 }
-                //Display how many will be deallocated
+                //Display how many rooms will be deallocated
                 Console.WriteLine($"You are deallocating {deAllRoom} room(s)");
                 //Use for loop for deallocating each room
                 for (int i = 0; i < deAllRoom; i++)
                 {
+                    //Display each deallocation
                     Console.WriteLine("***********************************************************************************");
                     Console.WriteLine($"Room Deallocation {i + 1}:");
+                    //Ask user to enter room number to deallocate
                     Console.Write("Please search Room Number to deallocate: ");
+                    //Convert user input to integer and save it
                     int searchRoom = Convert.ToInt32(Console.ReadLine());
                     //Use for loop to search matching room from list of rooms
                     for (int j = 0; j < noOfRoom; j++)
@@ -402,26 +418,33 @@ namespace Assessment_2Task1
                                 //Change room allocation status to deallocated
                                 listOfRooms[j].IsAllocated = false;
                                 //Display deallocation done message
-                                Console.WriteLine($"{searchRoom} has been deallocated");
+                                Console.WriteLine($"Room {searchRoom} has been deallocated");
+                                //Find the room number to deallocate from the list and remove
                                 RoomAllocation roomAllocation = listOfRoomAllocations.Find(x => x.AllocatedRoomNo == searchRoom);
                                 listOfRoomAllocations.Remove(roomAllocation);
                                 break;
                             }
-                            //If room is not allocated, display room not allocated message
+                            //If room is not allocated, display room not allocated message, and give user another chance
                             else
                             {
                                 Console.WriteLine($"Room {listOfRooms[j].RoomNo} is empty" +
                                     $"\nPlease find another room to deallocate");
+                                //Give user another chance
+                                i -= 1;
                                 break;
                             }
                         }
                         //For no match found
                         else
                         {
-                            //If no matching room number found, display message
-                            if (j == noOfRoom - 1)
+                            //If no matching room number found, display message, and give user another chance
+                            while (j == noOfRoom - 1)
                             {
-                                Console.WriteLine("Could not find matching room number to deallocate\nPlease enter correct room number or add room first");
+                                Console.WriteLine("Could not find matching room number to deallocate\n" +
+                                    "Please enter correct room number or add room first");
+                                //Give user another chance
+                                i -= 1;
+                                break;
                             }
                         }
                     }
@@ -447,15 +470,24 @@ namespace Assessment_2Task1
         //Method to display room allocations details
         public static void DisplayRoomAllocations()
         {
-            //Display 'display room allocation details' choice selected
-            Console.WriteLine("You have selected 'DISPLAY ROOM ALLOCATION DETAILS' from menu");
-            //Foreach loop to display details of allocated rooms and customers
-            foreach (RoomAllocation roomAllocation in listOfRoomAllocations)
+            //If condition to check there is any allocated rooms to display
+            if (listOfRoomAllocations.Count != 0)
             {
-                Console.WriteLine("***********************************************************************************");
-                Console.WriteLine($"Room Number: {roomAllocation.AllocatedRoomNo}");
-                Console.WriteLine($"Customer Number: {roomAllocation.AllocatedCustomer.CustomerNo}");
-                Console.WriteLine($"Customer Name: {roomAllocation.AllocatedCustomer.CustomerName}");
+                //Display 'display room allocation details' choice selected
+                Console.WriteLine("You have selected 'DISPLAY ROOM ALLOCATION DETAILS' from menu");
+                //Foreach loop to display details of allocated rooms and customers
+                foreach (RoomAllocation roomAllocation in listOfRoomAllocations)
+                {
+                    Console.WriteLine("***********************************************************************************");
+                    Console.WriteLine($"Room Number: {roomAllocation.AllocatedRoomNo}");
+                    Console.WriteLine($"Customer Number: {roomAllocation.AllocatedCustomer.CustomerNo}");
+                    Console.WriteLine($"Customer Name: {roomAllocation.AllocatedCustomer.CustomerName}");
+                }
+            }
+            //If nothing to display, display following message
+            else
+            {
+                Console.WriteLine("No allocated rooms to display\nPlease allocate rooms first");
             }
         }
         //Method to save the room allocations to file
@@ -505,7 +537,7 @@ namespace Assessment_2Task1
                 //Display 'show the room alocations from a file' choice selected
                 Console.WriteLine("You have selected 'SHOW THE ROOM ALLOCATIONS FROM A FILE' from menu");
                 //Initialise FileStream class with specified path, creation mode, and read permission
-                FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Read);
+                FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 //Declare new object for reading file
                 StreamReader streamReader = new StreamReader(file);
                 //Declare string variable
@@ -525,12 +557,6 @@ namespace Assessment_2Task1
                 Console.WriteLine(ex.Message);
                 Console.WriteLine("Please try again after 'save room allocations to a file' option first");
             }
-            catch (UnauthorizedAccessException ex)
-            {
-                //Display unauthorized access exception message
-                Console.WriteLine(ex.Message);
-                Console.WriteLine("File unable to read");
-            }
         }
         //Method to backup
         public static void BackUp()
@@ -549,14 +575,15 @@ namespace Assessment_2Task1
                     Console.WriteLine("'lhms_764703866_backup.txt' file already exist\nExisting file will be deleted");
                     //Delete existing back up file
                     File.Delete(filePathBackUp);
-                }
-                Console.WriteLine("***********************************************************************************");
+                    Console.WriteLine("***********************************************************************************");
+                } 
                 //Copy saved file to back up file
                 File.Copy(filePath, filePathBackUp);
                 //Delete original file
                 File.Delete(filePath);
                 //Display message of back up file saved and original file deleted
-                Console.WriteLine("Now your file 'lhms_764703866.txt' is saved as 'lhms_764703866_backup.txt'\nunder Documents folder and orignial file will be deleted");
+                Console.WriteLine("Now your file 'lhms_764703866.txt' is saved as 'lhms_764703866_backup.txt'\n" +
+                    "under Documents folder and orignial file will be deleted");
             }
             catch (FileNotFoundException ex)
             {
